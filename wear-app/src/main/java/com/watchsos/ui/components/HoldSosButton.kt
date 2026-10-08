@@ -26,19 +26,14 @@ fun HoldSosButton(onActivate: () -> Unit) {
     val activate by rememberUpdatedState(onActivate)
     var pressing by remember { mutableStateOf(false) }
     Box(
-        Modifier.size(96.dp)
-            .background(Color(0x33FF5964), CircleShape)
-            .border(1.dp, Color(0x66FF8290), CircleShape)
-            .padding(7.dp)
-            .background(Color(0x22FF5964), CircleShape)
-            .padding(5.dp)
+        Modifier.size(88.dp)
             .background(
                 Brush.verticalGradient(
-                    if (pressing) listOf(Color(0xFFFF8990), Color(0xFFFF4657))
-                    else listOf(Color(0xFFFF707A), Color(0xFFE92F45)),
+                    if (pressing) listOf(Color(0xFFFF7782), Color(0xFFE83F4E))
+                    else listOf(Color(0xFFFF6572), Color(0xFFE83949)),
                 ), CircleShape,
             )
-            .border(2.dp, Color.White.copy(alpha = 0.72f), CircleShape)
+            .border(1.dp, Color.White.copy(alpha = 0.52f), CircleShape)
             .semantics {
                 contentDescription = "SOS. Mantén presionado dos segundos"
                 role = Role.Button
@@ -54,11 +49,7 @@ fun HoldSosButton(onActivate: () -> Unit) {
                 })
             }, contentAlignment = Alignment.Center
     ) {
-        androidx.compose.foundation.layout.Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(if (pressing) "…" else "SOS", fontSize = 27.sp, letterSpacing = 1.sp,
-                color = Color.White, fontWeight = androidx.compose.ui.text.font.FontWeight.Black)
-            if (!pressing) Text("MANTENER", fontSize = 7.sp, letterSpacing = 1.sp,
-                color = Color.White.copy(alpha = 0.86f), fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
-        }
+        Text(if (pressing) "…" else "SOS", fontSize = 25.sp, letterSpacing = 1.sp,
+            color = Color.White, fontWeight = androidx.compose.ui.text.font.FontWeight.Black)
     }
 }
