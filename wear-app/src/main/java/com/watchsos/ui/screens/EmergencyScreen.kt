@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
@@ -89,25 +88,20 @@ private fun HomeState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(
-            text = if (state.status == EmergencyStatus.ERROR && !state.pending) state.syncMessage ?: "Revisa los permisos"
-                else "Emergencia SOS",
-            fontSize = 12.sp, letterSpacing = 0.1.sp,
-            fontWeight = FontWeight.SemiBold, color = Ink, textAlign = TextAlign.Center,
-            maxLines = 2, overflow = TextOverflow.Ellipsis,
-        )
-        if (state.status != EmergencyStatus.ERROR) LabelWithDot("Lista para ayudarte", Green)
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(
+                text = if (state.status == EmergencyStatus.ERROR && !state.pending) state.syncMessage ?: "Revisa los permisos"
+                    else "Emergencia SOS",
+                fontSize = 12.sp, letterSpacing = 0.1.sp,
+                fontWeight = FontWeight.SemiBold, color = Ink, textAlign = TextAlign.Center,
+                maxLines = 2, overflow = TextOverflow.Ellipsis,
+            )
+            if (state.status != EmergencyStatus.ERROR) LabelWithDot("Lista para ayudarte", Green)
+        }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            Box(Modifier.size(96.dp), contentAlignment = Alignment.Center) {
-                Box(
-                    Modifier.fillMaxSize().background(
-                        Brush.radialGradient(listOf(Red.copy(alpha = 0.15f), Color.Transparent)), CircleShape,
-                    ),
-                )
-                if (configurationReady) PermissionAction(onReady = onStart)
-                else Text("…", color = Secondary, fontSize = 28.sp)
-            }
+            if (configurationReady) PermissionAction(onReady = onStart)
+            else Text("…", color = Secondary, fontSize = 28.sp)
             Text("Mantén pulsado 2 s", fontSize = 10.sp, letterSpacing = 0.1.sp,
                 fontWeight = FontWeight.Medium, color = Secondary)
         }
