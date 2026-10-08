@@ -96,6 +96,7 @@ private fun HomeState(
             fontWeight = FontWeight.SemiBold, color = Ink, textAlign = TextAlign.Center,
             maxLines = 2, overflow = TextOverflow.Ellipsis,
         )
+        if (state.status != EmergencyStatus.ERROR) LabelWithDot("Lista para ayudarte", Green)
 
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(5.dp)) {
             Box(Modifier.size(96.dp), contentAlignment = Alignment.Center) {

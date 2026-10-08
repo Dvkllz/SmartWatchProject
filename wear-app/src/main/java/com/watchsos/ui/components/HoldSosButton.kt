@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.*
@@ -26,6 +27,7 @@ fun HoldSosButton(onActivate: () -> Unit) {
     val buttonColor = if (pressing) Color(0xFFFF6B63) else Color(0xFFFF453A)
     Box(
         Modifier.size(88.dp)
+            .shadow(12.dp, CircleShape, clip = false, ambientColor = Color(0x40FF453A), spotColor = Color(0x40FF453A))
             .background(buttonColor, CircleShape)
             .border(1.dp, Color.White.copy(alpha = 0.68f), CircleShape)
             .semantics {
