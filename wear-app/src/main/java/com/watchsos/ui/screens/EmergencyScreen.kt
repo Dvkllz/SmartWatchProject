@@ -58,7 +58,7 @@ fun EmergencyScreen(
     Box(Modifier.fillMaxSize().background(Canvas), contentAlignment = Alignment.Center) {
         when {
             state.status == EmergencyStatus.STOPPING -> CenterMessage(
-                label = "CERRANDO ALERTA",
+                label = "Cerrando alerta",
                 title = "Un momento",
                 detail = "Guardando y enviando tus datos",
                 accent = Blue,
@@ -130,27 +130,27 @@ private fun ActiveState(state: EmergencyState, onFinish: () -> Unit, accent: Col
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        LabelWithDot(if (state.status == EmergencyStatus.STARTING) "INICIANDO" else "EMERGENCIA ACTIVA", accent)
+        LabelWithDot(if (state.status == EmergencyStatus.STARTING) "Iniciando" else "Emergencia activa", accent)
 
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(if (state.serverConfirmed) "AYUDA EN CAMINO" else "ALERTA ENVIÁNDOSE",
-                fontSize = 16.sp, letterSpacing = 0.4.sp, lineHeight = 19.sp,
-                fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center, color = Ink)
+            Text(if (state.serverConfirmed) "Ayuda en camino" else "Enviando alerta",
+                fontSize = 17.sp, letterSpacing = 0.1.sp, lineHeight = 20.sp,
+                fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, color = Ink)
             Text(
                 text = buildString {
-                    append(if (state.recording) "● Audio activo" else "Audio no disponible")
+                    append(if (state.recording) "Audio activo" else "Audio no disponible")
                     append("\n")
                     append(state.locationMessage.ifBlank { "Buscando ubicación" })
                 },
                 fontSize = 10.sp, lineHeight = 15.sp, textAlign = TextAlign.Center,
                 color = Secondary, maxLines = 3, overflow = TextOverflow.Ellipsis,
             )
-            Text(if (state.serverConfirmed) "SERVIDOR CONFIRMADO" else "ESPERANDO AL SERVIDOR",
-                fontSize = 8.sp, letterSpacing = 0.8.sp, fontWeight = FontWeight.Bold,
+            Text(if (state.serverConfirmed) "Servidor confirmado" else "Esperando al servidor",
+                fontSize = 9.sp, letterSpacing = 0.1.sp, fontWeight = FontWeight.Medium,
                 color = if (state.serverConfirmed) Green else Gold, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
 
-        ActionButton("FINALIZAR", Red, onFinish)
+        ActionButton("Finalizar alerta", Red, onFinish, filled = true)
     }
 }
 
@@ -161,15 +161,15 @@ private fun PendingState(state: EmergencyState, onRetry: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        LabelWithDot("DATOS A SALVO", Gold)
+        LabelWithDot("Datos a salvo", Gold)
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(7.dp)) {
-            Text("SIN CONEXIÓN", fontSize = 17.sp, lineHeight = 20.sp, letterSpacing = 0.2.sp,
-                fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center, color = Ink)
+            Text("Sin conexión", fontSize = 18.sp, lineHeight = 21.sp, letterSpacing = 0.1.sp,
+                fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, color = Ink)
             Text(state.syncMessage ?: "La alerta sigue guardada en el reloj.", fontSize = 10.sp,
                 lineHeight = 14.sp, textAlign = TextAlign.Center, color = Secondary,
                 maxLines = 3, overflow = TextOverflow.Ellipsis)
         }
-        ActionButton("REINTENTAR ENVÍO", Gold, onRetry)
+        ActionButton("Reintentar envío", Blue, onRetry, filled = true)
     }
 }
 
@@ -180,17 +180,17 @@ private fun FinishedState(state: EmergencyState, configurationReady: Boolean, on
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        LabelWithDot("CIERRE CONFIRMADO", Green)
+        LabelWithDot("Cierre confirmado", Green)
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text("ALERTA\nFINALIZADA", fontSize = 17.sp, lineHeight = 20.sp, letterSpacing = 0.6.sp,
-                fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center, color = Ink)
+            Text("Alerta finalizada", fontSize = 17.sp, lineHeight = 20.sp, letterSpacing = 0.1.sp,
+                fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, color = Ink)
             Text(state.syncMessage ?: "El servidor confirmó el cierre.", fontSize = 9.sp, lineHeight = 12.sp,
                 textAlign = TextAlign.Center, color = Secondary, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
         if (configurationReady) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 PermissionAction(onReady = onStart)
-                Text("MANTÉN PARA OTRA ALERTA", fontSize = 7.sp, letterSpacing = 0.6.sp, color = Secondary)
+                Text("Mantén SOS para otra alerta", fontSize = 8.sp, letterSpacing = 0.1.sp, color = Secondary)
             }
         }
     }
@@ -212,27 +212,26 @@ private fun CenterMessage(label: String, title: String, detail: String, accent: 
 @Composable
 private fun LabelWithDot(label: String, accent: Color) {
     Row(
-        Modifier.clip(CircleShape).background(accent.copy(alpha = 0.10f))
-            .padding(horizontal = 9.dp, vertical = 5.dp),
+        Modifier.padding(vertical = 3.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(5.dp),
     ) {
         Box(Modifier.size(5.dp).background(accent, CircleShape))
-        Text(label, fontSize = 7.sp, letterSpacing = 0.8.sp, fontWeight = FontWeight.Bold,
+        Text(label, fontSize = 9.sp, letterSpacing = 0.1.sp, fontWeight = FontWeight.Medium,
             color = accent, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
 @Composable
-private fun ActionButton(label: String, accent: Color, onClick: () -> Unit) {
+private fun ActionButton(label: String, accent: Color, onClick: () -> Unit, filled: Boolean = false) {
     Box(
         Modifier.fillMaxWidth().height(40.dp).clip(CircleShape)
-            .background(accent.copy(alpha = 0.14f))
+            .background(if (filled) accent else accent.copy(alpha = 0.14f))
             .clickable(role = Role.Button, onClick = onClick)
             .semantics { contentDescription = label; role = Role.Button },
         contentAlignment = Alignment.Center,
     ) {
-        Text(label, color = accent, fontSize = 9.sp, letterSpacing = 1.sp,
-            fontWeight = FontWeight.ExtraBold, maxLines = 1)
+        Text(label, color = if (filled) Color.White else accent, fontSize = 10.sp, letterSpacing = 0.1.sp,
+            fontWeight = FontWeight.SemiBold, maxLines = 1)
     }
 }
