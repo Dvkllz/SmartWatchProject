@@ -85,15 +85,19 @@ private fun HomeState(
     onOpenLocation: () -> Unit,
 ) {
     Column(
-        Modifier.fillMaxSize().padding(start = 20.dp, top = 6.dp, end = 20.dp, bottom = 20.dp),
+        Modifier.fillMaxSize().padding(start = 20.dp, top = 8.dp, end = 20.dp, bottom = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text("WATCH SOS", fontSize = 10.sp, letterSpacing = 2.4.sp,
-            fontWeight = FontWeight.Bold, color = Ink)
+        Text(
+            text = if (state.status == EmergencyStatus.ERROR && !state.pending) state.syncMessage ?: "Revisa los permisos"
+                else "Emergencia SOS",
+            fontSize = 12.sp, letterSpacing = 0.1.sp,
+            fontWeight = FontWeight.SemiBold, color = Ink, textAlign = TextAlign.Center,
+            maxLines = 2, overflow = TextOverflow.Ellipsis,
+        )
 
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            LabelWithDot("PROTECCIÓN LISTA", Green)
             Box(Modifier.size(96.dp), contentAlignment = Alignment.Center) {
                 Box(
                     Modifier.fillMaxSize().background(
@@ -103,22 +107,19 @@ private fun HomeState(
                 if (configurationReady) PermissionAction(onReady = onStart)
                 else Text("…", color = Secondary, fontSize = 28.sp)
             }
-            Text("MANTÉN 2 SEGUNDOS", fontSize = 8.sp, letterSpacing = 1.2.sp,
-                fontWeight = FontWeight.SemiBold, color = Secondary)
+            Text("Mantén pulsado 2 s", fontSize = 10.sp, letterSpacing = 0.1.sp,
+                fontWeight = FontWeight.Medium, color = Secondary)
         }
 
         Text(
-            text = "⌖  GPS ACTIVO   ·   ${if (BuildConfig.DEMO) "DEMO" else "REAL"}",
+            text = if (BuildConfig.DEMO) "Ubicación simulada" else "GPS del reloj",
             modifier = Modifier.clip(RoundedCornerShape(50)).clickable(role = Role.Button, onClick = onOpenLocation)
-                .padding(horizontal = 10.dp, vertical = 3.dp),
-            color = if (BuildConfig.DEMO) Gold else Green,
-            fontSize = 8.sp, letterSpacing = 0.75.sp, fontWeight = FontWeight.Bold,
+                .padding(horizontal = 10.dp, vertical = 4.dp),
+            color = Secondary,
+            fontSize = 9.sp, letterSpacing = 0.1.sp, fontWeight = FontWeight.Medium,
             maxLines = 1,
         )
 
-        if (state.status == EmergencyStatus.ERROR && !state.pending) {
-            state.syncMessage?.let { Text(it, color = Gold, fontSize = 9.sp, textAlign = TextAlign.Center, maxLines = 1) }
-        }
     }
 }
 
