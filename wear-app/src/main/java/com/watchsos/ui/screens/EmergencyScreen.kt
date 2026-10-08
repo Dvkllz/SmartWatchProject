@@ -30,13 +30,13 @@ import com.watchsos.model.EmergencyState
 import com.watchsos.model.EmergencyStatus
 import com.watchsos.ui.components.PermissionAction
 
-private val Canvas = Color(0xFF080B10)
-private val Ink = Color(0xFFF4F6F9)
-private val Secondary = Color(0xFFA2ADBA)
-private val Red = Color(0xFFFF5361)
-private val Green = Color(0xFF5FE0AE)
-private val Gold = Color(0xFFFFC46B)
-private val Blue = Color(0xFF86B4FF)
+private val Canvas = Color.Black
+private val Ink = Color(0xFFF5F5F7)
+private val Secondary = Color(0xFF8E8E93)
+private val Red = Color(0xFFFF453A)
+private val Green = Color(0xFF30D158)
+private val Gold = Color(0xFFFF9F0A)
+private val Blue = Color(0xFF0A84FF)
 
 @Composable
 fun EmergencyScreen(

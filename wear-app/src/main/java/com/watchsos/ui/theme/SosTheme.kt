@@ -7,5 +7,5 @@ import androidx.wear.compose.material.MaterialTheme
 
 @Composable
 fun SosTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colors = Colors(primary = Color(0xFFFF5252), background = Color.Black), content = content)
+    MaterialTheme(colors = Colors(primary = Color(0xFFFF453A), background = Color.Black), content = content)
 }
