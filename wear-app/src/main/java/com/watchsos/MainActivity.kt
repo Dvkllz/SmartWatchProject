@@ -14,11 +14,22 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SosTheme {
                 val viewModel: EmergencyViewModel = viewModel()
+                val app = application as SosApplication
                 val state by viewModel.state.collectAsStateWithLifecycle()
-                EmergencyScreen(state, viewModel.configurationReady, viewModel::start, viewModel::finish, viewModel::retryFinish)
-            }
+                val preferences by app.uiPreferences.collectAsStateWithLifecycle()
+                SosTheme(preferences.theme) {
+                    EmergencyScreen(
+                        state = state,
+                        configurationReady = viewModel.configurationReady,
+                        preferences = preferences,
+                        onStart = viewModel::start,
+                        onFinish = viewModel::finish,
+                        onRetry = viewModel::retryFinish,
+                        onThemeChange = app::setTheme,
+                        onLanguageChange = app::setLanguage,
+                    )
+                }
         }
     }
 }
