@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
@@ -124,32 +125,32 @@ private fun HomeState(
                 .align(Alignment.TopCenter).padding(top = 10.dp),
             contentAlignment = Alignment.Center,
         ) {
-                Column(
-                    modifier = Modifier.padding(end = 20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                ) {
-                    Text(
-                        text = if (state.status == EmergencyStatus.ERROR && !state.pending)
-                            localize(state.syncMessage ?: tx(preferences.language, "Revisa los permisos", "Check permissions"), preferences.language)
-                        else tx(preferences.language, "Emergencia SOS", "Emergency SOS"),
-                        fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = palette.foreground,
-                        textAlign = TextAlign.Center, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                    )
-                    if (state.status != EmergencyStatus.ERROR) LabelWithDot(tx(preferences.language, "Lista para ayudarte", "Ready to help"), palette.positive)
-                }
-                SmallSettingsButton(
-                    language = preferences.language,
-                    palette = palette,
-                    modifier = Modifier.align(Alignment.TopEnd),
-                    onClick = { showSettings = true },
+            Column(
+                modifier = Modifier.padding(end = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(1.dp),
+            ) {
+                Text(
+                    text = if (state.status == EmergencyStatus.ERROR && !state.pending)
+                        localize(state.syncMessage ?: tx(preferences.language, "Revisa los permisos", "Check permissions"), preferences.language)
+                    else tx(preferences.language, "EMERGENCIA SOS", "EMERGENCY SOS"),
+                    fontSize = 8.sp, letterSpacing = 1.1.sp, fontWeight = FontWeight.SemiBold,
+                    color = palette.secondary, textAlign = TextAlign.Center, maxLines = 1, overflow = TextOverflow.Ellipsis,
                 )
+                if (state.status != EmergencyStatus.ERROR) ReadyLabel(preferences.language, palette)
+            }
+            SmallSettingsButton(
+                language = preferences.language,
+                palette = palette,
+                modifier = Modifier.align(Alignment.TopEnd),
+                onClick = { showSettings = true },
+            )
         }
 
         Column(
-            Modifier.align(Alignment.Center).offset(y = (-1).dp),
+            Modifier.align(Alignment.Center).offset(y = (-2).dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
         ) {
             val pulse = rememberInfiniteTransition(label = "sos-halo")
             val haloScale by pulse.animateFloat(
@@ -158,11 +159,16 @@ private fun HomeState(
                 animationSpec = infiniteRepeatable(tween(1_800), repeatMode = RepeatMode.Reverse),
                 label = "sos-halo-scale",
             )
-            Box(Modifier.size(88.dp), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(100.dp), contentAlignment = Alignment.Center) {
                 Box(
-                    Modifier.size(86.dp)
+                    Modifier.size(160.dp).background(
+                        Brush.radialGradient(listOf(palette.alert.copy(alpha = 0.17f), Color.Transparent)), CircleShape,
+                    ),
+                )
+                Box(
+                    Modifier.size(90.dp)
                         .graphicsLayer { scaleX = haloScale; scaleY = haloScale }
-                        .border(1.dp, palette.alert.copy(alpha = 0.22f), CircleShape),
+                        .border(1.dp, palette.alert.copy(alpha = 0.26f), CircleShape),
                 )
                 if (configurationReady) PermissionAction(preferences.language, onReady = onStart)
                 else Text("…", color = palette.secondary, fontSize = 28.sp)
@@ -172,8 +178,8 @@ private fun HomeState(
 
         LocationBadge(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 20.dp),
-                label = if (BuildConfig.DEMO) tx(preferences.language, "GPS simulado", "Demo GPS")
-                    else tx(preferences.language, "GPS del reloj", "Watch GPS"),
+                label = if (BuildConfig.DEMO) tx(preferences.language, "GPS SIMULADO", "DEMO GPS")
+                    else tx(preferences.language, "GPS DEL RELOJ", "WATCH GPS"),
                 palette = palette,
                 onClick = onOpenLocation,
         )
@@ -190,16 +196,14 @@ private fun HomeState(
 @Composable
 private fun HoldHint(language: AppLanguage, palette: com.watchsos.ui.theme.SosPalette) {
     Row(
-        Modifier.clip(CircleShape)
-            .background(palette.surface)
-            .border(1.dp, palette.secondary.copy(alpha = 0.12f), CircleShape)
-            .padding(horizontal = 9.dp, vertical = 3.dp),
+        Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(7.dp),
     ) {
-        Text("2 s", color = palette.alert, fontSize = 8.sp, fontWeight = FontWeight.Bold)
-        Text(tx(language, "Mantén para activar", "Hold to activate"),
-            color = palette.secondary, fontSize = 9.sp, fontWeight = FontWeight.Medium)
+        Text("2 S", color = palette.alert, fontSize = 8.sp, letterSpacing = 0.6.sp, fontWeight = FontWeight.Bold)
+        Box(Modifier.width(1.dp).height(8.dp).background(palette.secondary.copy(alpha = 0.45f)))
+        Text(tx(language, "MANTÉN PARA ACTIVAR", "HOLD TO ACTIVATE"),
+            color = palette.secondary, fontSize = 7.sp, letterSpacing = 0.65.sp, fontWeight = FontWeight.SemiBold)
     }
 }
 
@@ -211,18 +215,28 @@ private fun LocationBadge(
     onClick: () -> Unit,
 ) {
     Row(
-        modifier.clip(CircleShape)
-            .background(palette.surface)
-            .border(1.dp, palette.secondary.copy(alpha = 0.12f), CircleShape)
+        modifier
             .clickable(role = Role.Button, onClick = onClick)
             .semantics { contentDescription = label; role = Role.Button }
-            .padding(horizontal = 9.dp, vertical = 4.dp),
+            .padding(horizontal = 10.dp, vertical = 5.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Text("⌖", color = palette.accent, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-        Text(label, color = palette.secondary, fontSize = 8.sp, fontWeight = FontWeight.Medium, maxLines = 1)
-        Text("›", color = palette.secondary.copy(alpha = 0.7f), fontSize = 12.sp)
+        Text(label, color = palette.secondary, fontSize = 7.sp, letterSpacing = 1.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+    }
+}
+
+@Composable
+private fun ReadyLabel(language: AppLanguage, palette: com.watchsos.ui.theme.SosPalette) {
+    Row(
+        Modifier.padding(vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+    ) {
+        Box(Modifier.size(5.dp).background(palette.positive, CircleShape))
+        Text(tx(language, "LISTA PARA AYUDAR", "READY TO HELP"),
+            fontSize = 7.sp, letterSpacing = 0.75.sp, fontWeight = FontWeight.Medium, color = palette.foreground)
     }
 }
 
@@ -333,7 +347,7 @@ private fun LabelWithDot(label: String, accent: Color, animated: Boolean = false
         label = "status-pulse",
     )
     Row(
-        Modifier.clip(CircleShape).background(palette.surface).padding(horizontal = 8.dp, vertical = 4.dp),
+        Modifier.padding(vertical = 3.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(5.dp),
     ) {
