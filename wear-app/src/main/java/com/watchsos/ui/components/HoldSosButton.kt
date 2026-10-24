@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -40,11 +41,11 @@ fun HoldSosButton(language: AppLanguage, onActivate: () -> Unit) {
         label = "sos-button-press",
     )
     Box(
-        Modifier.size(88.dp)
+        Modifier.size(80.dp)
             .graphicsLayer { scaleX = scale; scaleY = scale }
-            .shadow(12.dp, CircleShape, clip = false, ambientColor = Color(0x40FF453A), spotColor = Color(0x40FF453A))
-            .background(buttonColor, CircleShape)
-            .border(1.dp, Color.White.copy(alpha = 0.68f), CircleShape)
+            .shadow(16.dp, CircleShape, clip = false, ambientColor = Color(0x55FF453A), spotColor = Color(0x55FF453A))
+            .background(Brush.verticalGradient(listOf(buttonColor.copy(alpha = 0.92f), buttonColor)), CircleShape)
+            .border(1.dp, Color.White.copy(alpha = 0.42f), CircleShape)
             .semantics {
                 contentDescription = if (language == AppLanguage.ES) "SOS. Mantén presionado dos segundos" else "SOS. Press and hold for two seconds"
                 role = Role.Button
