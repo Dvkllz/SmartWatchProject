@@ -54,6 +54,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.10.1")
     implementation("androidx.compose.ui:ui:1.8.2")
     implementation("androidx.compose.foundation:foundation:1.8.2")
+    implementation("androidx.compose.animation:animation:1.8.2")
     implementation("androidx.wear.compose:compose-material:1.5.0")
     implementation("androidx.wear.compose:compose-foundation:1.5.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
