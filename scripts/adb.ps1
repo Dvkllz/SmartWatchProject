@@ -6,4 +6,4 @@ $env:ANDROID_SDK_HOME = Join-Path $root '.tools'
 $adb = Join-Path $root '.tools\android-sdk\platform-tools\adb.exe'
 if (-not (Test-Path $adb)) { throw 'No hay SDK local. Usa el adb de tu instalación Android SDK.' }
 & $adb @Arguments
-if ($LASTEXITCODE -ne 0) { throw "ADB terminó con código $LASTEXITCODE" }
+if ($LASTEXITCODE -ne 0) { throw "ADB termino con codigo $LASTEXITCODE" }
