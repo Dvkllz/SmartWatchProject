@@ -52,10 +52,11 @@ Las llamadas se hacen al crear una emergencia no simulada; el mensaje de voz anu
 
 ```powershell
 .\scripts\build.ps1
-.\gradlew.bat :wear-app:assembleLiveDebug :wear-app:testDemoDebugUnitTest :wear-app:lintDemoDebug
+.\scripts\build.ps1 -Tasks ':wear-app:assembleLiveDebug',':wear-app:testDemoDebugUnitTest',':wear-app:lintDemoDebug'
+.\scripts\run-app.ps1 -Variant Demo
 ```
 
-El script de Windows utiliza el JDK existente en `C:\AppAndroid\.tools` únicamente si `JAVA_HOME` no está configurado. En otro equipo configurar `JAVA_HOME`. La caché de compilación del script queda en `.gradle-user` dentro de este proyecto.
+El script de Windows usa primero el JDK local en `.tools/jdk-21`; si no existe, acepta un `JAVA_HOME` con JDK 17–24. Java 25 no es compatible con esta versión de Gradle. La caché de compilación queda en `.gradle-user` dentro de este proyecto. `run-app.ps1` compila, arranca el AVD, espera el fin del arranque, instala y abre la variante elegida.
 
 El proyecto ya incluye APK de prueba en `wear-app/build/outputs/apk/demo/debug/` y `wear-app/build/outputs/apk/live/debug/`. El informe de pruebas y los comandos del emulador local están en [docs/TESTING.md](docs/TESTING.md).
 
