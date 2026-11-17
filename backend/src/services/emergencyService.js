@@ -1,5 +1,5 @@
 import { randomUUID, createHash } from 'node:crypto';
-import { mkdir, writeFile, rename } from 'node:fs/promises';
+import { mkdir, writeFile, rename, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { HttpError, requireActive, audioFormat } from '../models/emergency.js';
 
@@ -86,5 +86,29 @@ export class EmergencyService {
     if (!record) throw new HttpError(404, 'Emergencia no encontrada');
     const { fingerprint, ...publicRecord } = record;
     return publicRecord;
+  }
+  async list() {
+    const records = await this.repository.list();
+    return records.slice(0, 30).map(record => ({
+      emergencyId: record.emergencyId,
+      status: record.status,
+      receivedAt: record.receivedAt,
+      finishedAt: record.finishedAt,
+      simulated: record.simulated,
+      audio: record.audio.map(({ uploadId, bytes, mimeType, receivedAt, simulated }) =>
+        ({ uploadId, bytes, mimeType, receivedAt, simulated })),
+    }));
+  }
+  async audioFile(id, uploadId) {
+    const record = await this.repository.get(id);
+    if (!record) throw new HttpError(404, 'Emergencia no encontrada');
+    const entry = record.audio.find(item => item.uploadId === uploadId);
+    if (!entry) throw new HttpError(404, 'Grabación no encontrada');
+    const directory = path.resolve(this.config.uploadDir, id);
+    const target = path.resolve(directory, entry.filename);
+    if (!target.startsWith(`${directory}${path.sep}`)) throw new HttpError(400, 'Ruta de audio inválida');
+    try { await stat(target); }
+    catch (error) { if (error.code === 'ENOENT') throw new HttpError(404, 'Archivo de audio no encontrado'); throw error; }
+    return { path: target, mimeType: entry.mimeType, filename: entry.filename };
   }
 }

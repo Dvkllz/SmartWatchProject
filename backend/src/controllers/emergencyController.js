@@ -16,5 +16,11 @@ export function emergencyController(service) {
     },
     finish: async (req, res) => res.json(await service.finish(req.params.id, finishSchema.parse(req.body))),
     get: async (req, res) => res.json(await service.get(req.params.id)),
+    list: async (req, res) => res.json(await service.list()),
+    recording: async (req, res, next) => {
+      const file = await service.audioFile(req.params.id, idSchema.parse(req.params.uploadId));
+      res.type(file.mimeType).set('Cache-Control', 'private, max-age=3600');
+      res.sendFile(file.path, error => { if (error) next(error); });
+    },
   };
 }

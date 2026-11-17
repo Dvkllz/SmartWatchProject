@@ -12,7 +12,9 @@ export function emergencyRoutes(service, config) {
     try { idSchema.parse(id); next(); } catch (error) { next(error); }
   });
   router.post('/', controller.create);
+  router.get('/', controller.list);
   router.get('/:id', controller.get);
+  router.get('/:id/audio/:uploadId', controller.recording);
   router.post('/:id/location', controller.location);
   router.post('/:id/audio', upload.single('audio'), controller.audio);
   router.post('/:id/finish', controller.finish);

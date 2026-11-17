@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, rename, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { idSchema } from '../models/emergency.js';
 
@@ -10,6 +10,15 @@ export class JsonEmergencyRepository {
     idSchema.parse(id);
     try { return JSON.parse(await readFile(path.join(this.directory, `${id}.json`), 'utf8')); }
     catch (error) { if (error.code === 'ENOENT') return null; throw error; }
+  }
+  async list() {
+    let names;
+    try { names = await readdir(this.directory); }
+    catch (error) { if (error.code === 'ENOENT') return []; throw error; }
+    const records = await Promise.all(names.filter(name => /^[0-9a-f-]{36}\.json$/i.test(name))
+      .map(name => this.get(name.slice(0, -5))));
+    return records.filter(Boolean).sort((left, right) =>
+      Date.parse(right.receivedAt ?? right.timestamp) - Date.parse(left.receivedAt ?? left.timestamp));
   }
   transaction(id, mutation) {
     idSchema.parse(id);
