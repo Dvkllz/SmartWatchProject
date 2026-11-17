@@ -18,15 +18,20 @@ export class NotificationService {
   }
 
   async callTrustedContacts(record) {
-    const { accountSid, authToken, fromNumber, trustedContacts } = this.voiceCalls;
+    const { accountSid, authToken, fromNumber, trustedContacts, trialMode = false } = this.voiceCalls;
     const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Calls.json`;
     const authorization = `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString('base64')}`;
-    const body = new URLSearchParams({
-      From: fromNumber,
-      Twiml: buildEmergencyTwiML(record),
-      Timeout: '20',
-      TimeLimit: '60',
-    });
+    const body = trialMode
+      ? new URLSearchParams({
+          From: fromNumber,
+          Url: 'https://webhooks.twilio.com/v1/Voice/Template/voice_text_to_speech',
+        })
+      : new URLSearchParams({
+          From: fromNumber,
+          Twiml: buildEmergencyTwiML(record),
+          Timeout: '20',
+          TimeLimit: '60',
+        });
 
     const outcomes = await Promise.allSettled(trustedContacts.map(async (to, index) => {
       const response = await this.fetch(url, {
@@ -42,6 +47,7 @@ export class NotificationService {
         contactIndex: index + 1,
         callSid: result.sid,
         status: result.status,
+        trialMode,
       });
     }));
 

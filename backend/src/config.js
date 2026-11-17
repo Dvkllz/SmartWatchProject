@@ -18,6 +18,7 @@ export const config = {
     authToken: process.env.TWILIO_AUTH_TOKEN?.trim() ?? '',
     fromNumber: process.env.TWILIO_FROM_NUMBER?.trim() ?? '',
     trustedContacts: (process.env.TRUSTED_CONTACTS ?? '').split(',').map(value => value.trim()).filter(Boolean),
+    trialMode: process.env.TWILIO_TRIAL_MODE === 'true',
   },
   maxAudioBytes: integer('MAX_AUDIO_BYTES', 8 * 1024 * 1024, 44, 32 * 1024 * 1024),
   maxSessionAudioBytes: integer('MAX_SESSION_AUDIO_BYTES', 100 * 1024 * 1024, 44, 1024 * 1024 * 1024),
