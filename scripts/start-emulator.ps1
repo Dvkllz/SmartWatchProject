@@ -10,7 +10,7 @@ $emulator = Join-Path $env:ANDROID_HOME 'emulator\emulator.exe'
 if (-not (Test-Path $emulator) -or -not (Test-Path (Join-Path $env:ANDROID_AVD_HOME 'WatchSosDemo.ini'))) {
     throw 'El AVD local no está instalado. Crea un dispositivo Wear OS desde Android Studio; consulta README.md.'
 }
-$emulatorArgs = @('-avd','WatchSosDemo','-port','5556','-no-snapshot','-gpu','swiftshader_indirect','-no-boot-anim','-memory','1536','-cores','2')
+$emulatorArgs = @('-avd','WatchSosDemo','-port','5556','-no-snapshot','-gpu','swiftshader_indirect','-no-boot-anim','-no-metrics','-memory','2048','-cores','2')
 if ($EnableMicrophone) {
     $configPath = Join-Path $env:ANDROID_AVD_HOME 'WatchSosDemo.avd/config.ini'
     $config = Get-Content -LiteralPath $configPath -Raw
