@@ -36,6 +36,12 @@ El servidor escucha en `127.0.0.1:3000`. `GET http://localhost:3000/health` comp
 
 Las variables y límites están documentados en `backend/.env.example`; se puede copiar como `.env`. Para un reloj físico, usar una dirección accesible desde su red y establecer `HOST` deliberadamente. No publicar este servidor de demostración en Internet: no incorpora autenticación de usuarios. Antes de producción hacen falta identidad verificable, autorización por emergencia, HTTPS, política de retención y un proveedor real de notificaciones.
 
+### Llamadas a contactos de confianza
+
+El backend puede iniciar llamadas de voz con Twilio Programmable Voice cuando recibe un SOS real. Por seguridad, `DEMO_NOTIFICATIONS=true` es el valor predeterminado: solo registra `ALERTA SIMULADA` y no llama a nadie. Para activar llamadas, copia `backend/.env.example` a `backend/.env`, configura `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, un `TWILIO_FROM_NUMBER` de Twilio y de 1 a 5 números en `TRUSTED_CONTACTS`, separados por comas y en formato E.164; después establece `DEMO_NOTIFICATIONS=false`. No guardes credenciales en Git.
+
+Las llamadas se hacen al crear una emergencia no simulada; el mensaje de voz anuncia el SOS y lee las coordenadas cuando están disponibles. La variante `demoDebug` nunca llama a contactos. Para probar con el emulador usa `liveDebug`, un número propio verificado en Twilio y el backend local; las cuentas de prueba de Twilio pueden limitar los destinos y las llamadas pueden generar cargos. La llamada la inicia el backend mediante la API de llamadas salientes de Twilio ([documentación oficial](https://www.twilio.com/docs/voice/api/call-resource)).
+
 ## Abrir y compilar la app
 
 1. Abrir **C:\AppSmartWatch** con Android Studio y sincronizar Gradle.
