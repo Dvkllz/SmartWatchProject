@@ -42,6 +42,8 @@ El backend puede iniciar llamadas de voz con Twilio Programmable Voice cuando re
 
 Las llamadas se hacen al crear una emergencia no simulada; el mensaje de voz anuncia el SOS y lee las coordenadas cuando están disponibles. La variante `demoDebug` nunca llama a contactos. Para probar con el emulador usa `liveDebug`, un número propio verificado en Twilio y el backend local; las cuentas de prueba de Twilio pueden limitar los destinos y las llamadas pueden generar cargos. La llamada la inicia el backend mediante la API de llamadas salientes de Twilio ([documentación oficial](https://www.twilio.com/docs/voice/api/call-resource)).
 
+La pantalla principal incluye el botón `♫` para consultar las grabaciones recibidas por el backend. La lista muestra los segmentos más recientes y los descarga a la caché privada del reloj antes de reproducirlos. Durante una emergencia confirmada la interfaz mantiene el estado activo y muestra **Alerta enviada**; `Offline` queda reservado para una sesión realmente interrumpida con datos pendientes.
+
 ## Abrir y compilar la app
 
 1. Abrir **C:\AppSmartWatch** con Android Studio y sincronizar Gradle.
