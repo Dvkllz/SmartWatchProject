@@ -17,15 +17,19 @@ class MainActivity : ComponentActivity() {
                 val viewModel: EmergencyViewModel = viewModel()
                 val app = application as SosApplication
                 val state by viewModel.state.collectAsStateWithLifecycle()
+                val recordings by viewModel.recordings.collectAsStateWithLifecycle()
                 val preferences by app.uiPreferences.collectAsStateWithLifecycle()
                 SosTheme(preferences.theme) {
                     EmergencyScreen(
                         state = state,
                         configurationReady = viewModel.configurationReady,
                         preferences = preferences,
+                        recordings = recordings,
                         onStart = viewModel::start,
                         onFinish = viewModel::finish,
                         onRetry = viewModel::retryFinish,
+                        onLoadRecordings = viewModel::loadRecordings,
+                        onPrepareRecording = viewModel::recordingPath,
                         onThemeChange = app::setTheme,
                         onLanguageChange = app::setLanguage,
                     )

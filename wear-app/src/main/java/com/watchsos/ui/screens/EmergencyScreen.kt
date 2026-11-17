@@ -49,6 +49,8 @@ import com.watchsos.AppThemeMode
 import com.watchsos.AppUiPreferences
 import com.watchsos.model.EmergencyState
 import com.watchsos.model.EmergencyStatus
+import com.watchsos.model.RecordingsState
+import com.watchsos.model.RecordingItem
 import com.watchsos.ui.components.PermissionAction
 import com.watchsos.ui.theme.LocalSosPalette
 
@@ -57,24 +59,31 @@ fun EmergencyScreen(
     state: EmergencyState,
     configurationReady: Boolean,
     preferences: AppUiPreferences,
+    recordings: RecordingsState,
     onStart: () -> Unit,
     onFinish: () -> Unit,
     onRetry: () -> Unit,
+    onLoadRecordings: () -> Unit,
+    onPrepareRecording: suspend (RecordingItem) -> String,
     onThemeChange: (AppThemeMode) -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
 ) {
     val context = LocalContext.current
     val palette = LocalSosPalette.current
+    var showRecordings by remember { mutableStateOf(false) }
     val running = state.status in setOf(EmergencyStatus.STARTING, EmergencyStatus.ACTIVE)
     val screen = when {
         state.status == EmergencyStatus.STOPPING -> "stopping"
-        state.pending -> "pending"
         running -> "active"
+        state.pending -> "pending"
         state.status == EmergencyStatus.FINISHED -> "finished"
         else -> "home"
     }
 
     Box(Modifier.fillMaxSize().background(palette.background), contentAlignment = Alignment.Center) {
+        if (showRecordings) {
+            RecordingsScreen(recordings, preferences.language, onLoadRecordings, onPrepareRecording) { showRecordings = false }
+        } else {
         AnimatedContent(
             targetState = screen,
             transitionSpec = {
@@ -103,6 +112,12 @@ fun EmergencyScreen(
                     onLanguageChange = onLanguageChange,
                 )
             }
+        }
+        if (screen == "home" || screen == "finished") SmallRecordingsButton(
+            language = preferences.language,
+            palette = palette,
+            modifier = Modifier.align(Alignment.TopStart),
+        ) { showRecordings = true; onLoadRecordings() }
         }
     }
 }
@@ -253,7 +268,7 @@ private fun ActiveState(state: EmergencyState, onFinish: () -> Unit, language: A
             animated = state.status == EmergencyStatus.ACTIVE)
 
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(if (state.serverConfirmed) tx(language, "Ayuda en camino", "Help is on the way") else tx(language, "Enviando alerta", "Sending alert"),
+            Text(if (state.serverConfirmed) tx(language, "Alerta enviada", "Alert sent") else tx(language, "Enviando alerta", "Sending alert"),
                 fontSize = 17.sp, letterSpacing = 0.1.sp, lineHeight = 20.sp,
                 fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, color = palette.foreground)
             Text(
@@ -265,7 +280,7 @@ private fun ActiveState(state: EmergencyState, onFinish: () -> Unit, language: A
                 fontSize = 10.sp, lineHeight = 15.sp, textAlign = TextAlign.Center,
                 color = palette.secondary, maxLines = 3, overflow = TextOverflow.Ellipsis,
             )
-            Text(if (state.serverConfirmed) tx(language, "Servidor confirmado", "Server confirmed") else tx(language, "Esperando al servidor", "Waiting for server"),
+            Text(if (state.serverConfirmed) tx(language, "SOS confirmado por el servidor", "SOS confirmed by server") else tx(language, "Esperando al servidor", "Waiting for server"),
                 fontSize = 9.sp, letterSpacing = 0.1.sp, fontWeight = FontWeight.Medium,
                 color = if (state.serverConfirmed) palette.positive else palette.warning, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
@@ -386,6 +401,25 @@ private fun SmallSettingsButton(
         contentAlignment = Alignment.Center,
     ) {
         Text("⚙", fontSize = 12.sp, color = palette.secondary)
+    }
+}
+
+@Composable
+private fun SmallRecordingsButton(
+    language: AppLanguage,
+    palette: com.watchsos.ui.theme.SosPalette,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier.padding(start = 28.dp, top = 38.dp).height(27.dp).clip(CircleShape).background(palette.surface)
+            .border(1.dp, palette.secondary.copy(alpha = 0.22f), CircleShape)
+            .clickable(role = Role.Button, onClick = onClick)
+            .semantics { contentDescription = tx(language, "Grabaciones", "Recordings"); role = Role.Button }
+            .padding(horizontal = 9.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text("♫", fontSize = 11.sp, color = palette.accent)
     }
 }
 
