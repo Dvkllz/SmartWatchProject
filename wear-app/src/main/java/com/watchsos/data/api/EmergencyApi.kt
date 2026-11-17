@@ -1,8 +1,10 @@
 package com.watchsos.data.api
 
 import com.watchsos.model.LocationSample
+import com.watchsos.model.RemoteEmergency
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.http.*
 
 data class CreateEmergencyRequest(
@@ -17,6 +19,13 @@ data class EmergencyResponse(val emergencyId: String, val status: String)
 data class FinishRequest(val timestamp: String)
 
 interface EmergencyApi {
+    @GET("api/emergencies")
+    suspend fun emergencies(): List<RemoteEmergency>
+
+    @Streaming
+    @GET("api/emergencies/{id}/audio/{uploadId}")
+    suspend fun recording(@Path("id") id: String, @Path("uploadId") uploadId: String): ResponseBody
+
     @POST("api/emergencies")
     suspend fun create(@Header("Idempotency-Key") key: String, @Body body: CreateEmergencyRequest): EmergencyResponse
 

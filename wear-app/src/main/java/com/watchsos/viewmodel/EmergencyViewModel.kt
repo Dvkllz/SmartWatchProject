@@ -7,6 +7,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.watchsos.SosApplication
 import com.watchsos.model.EmergencyStatus
+import com.watchsos.model.RecordingsState
+import com.watchsos.model.RecordingItem
 import com.watchsos.service.EmergencyService
 import com.watchsos.util.SosPermissions
 import kotlinx.coroutines.CancellationException
@@ -18,6 +20,22 @@ class EmergencyViewModel(application: Application) : AndroidViewModel(applicatio
     private val app = application as SosApplication
     val state = app.state.asStateFlow()
     val configurationReady get() = app.repository.isSuccess
+    private val _recordings = kotlinx.coroutines.flow.MutableStateFlow(RecordingsState())
+    val recordings = _recordings.asStateFlow()
+
+    fun loadRecordings() {
+        _recordings.value = RecordingsState(loading = true)
+        viewModelScope.launch {
+            _recordings.value = try {
+                RecordingsState(items = app.repository.getOrThrow().recordings())
+            } catch (_: Exception) {
+                RecordingsState(error = "No se pudieron cargar las grabaciones")
+            }
+        }
+    }
+
+    suspend fun recordingPath(item: RecordingItem): String =
+        app.repository.getOrThrow().recordingFile(item).absolutePath
 
     fun start() {
         if (state.value.status in setOf(EmergencyStatus.STARTING, EmergencyStatus.ACTIVE, EmergencyStatus.STOPPING) || state.value.pending) return

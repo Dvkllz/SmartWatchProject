@@ -63,6 +63,29 @@ class EmergencyRepository(private val storage: SessionStorage, private val api: 
         }
     }
 
+    suspend fun recordings(): List<RecordingItem> = withContext(Dispatchers.IO) {
+        api.emergencies().flatMap { emergency ->
+            emergency.audio.map { audio ->
+                RecordingItem(emergency.emergencyId, audio.uploadId, audio.receivedAt, audio.bytes, audio.simulated)
+            }
+        }.sortedByDescending { it.receivedAt }.take(50)
+    }
+
+    suspend fun recordingFile(item: RecordingItem): File = withContext(Dispatchers.IO) {
+        val directory = File(audioRoot, "history").apply { mkdirs() }.canonicalFile
+        val extension = if (item.simulated) "wav" else "m4a"
+        val target = File(directory, "${item.emergencyId}-${item.uploadId}.$extension").canonicalFile
+        check(target.parentFile == directory)
+        if (target.isFile && target.length() > 44) return@withContext target
+        val temporary = File(directory, "${target.name}.part")
+        api.recording(item.emergencyId, item.uploadId).use { body ->
+            body.byteStream().use { input -> temporary.outputStream().use { output -> input.copyTo(output) } }
+        }
+        check(temporary.length() > 44) { "Grabación vacía" }
+        check(temporary.renameTo(target)) { "No se pudo guardar la grabación" }
+        target
+    }
+
     // La red nunca mantiene el bloqueo de disco: grabación y GPS pueden guardar mientras se envía.
     suspend fun sync(): Boolean = withContext(Dispatchers.IO) {
         syncMutex.withLock {
