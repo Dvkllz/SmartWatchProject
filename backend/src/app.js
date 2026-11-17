@@ -18,7 +18,7 @@ export function createApp(config, { logger = console, notifications, repository 
   app.use(express.json({ limit: '16kb' }));
   app.get('/health', (req, res) => res.json({ status: 'ok' }));
   const service = new EmergencyService(repository ?? new JsonEmergencyRepository(config.dataDir),
-    notifications ?? new NotificationService({ demo: config.demoNotifications, logger }), config, logger);
+    notifications ?? new NotificationService({ demo: config.demoNotifications, logger, voiceCalls: config.voiceCalls }), config, logger);
   app.use('/api/emergencies', emergencyRoutes(service, config));
   app.use((req, res) => res.status(404).json({ error: 'Ruta no encontrada' }));
   app.use((error, req, res, next) => {
