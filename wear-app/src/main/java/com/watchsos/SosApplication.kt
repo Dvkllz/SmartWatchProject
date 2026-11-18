@@ -35,7 +35,8 @@ class SosApplication : Application() {
         }
         val pending = repository.getOrNull()?.pending
         if (pending != null) state.value = EmergencyState(EmergencyStatus.ERROR, pending.id,
-            serverConfirmed = pending.serverConfirmed, pending = true,
+            serverConfirmed = pending.serverConfirmed, contactsAccepted = pending.contactsAccepted,
+            contactsFailed = pending.contactsFailed, pending = true,
             syncMessage = "Sesión interrumpida. Finaliza y envía los datos pendientes.")
         if (repository.isFailure) state.value = EmergencyState(EmergencyStatus.ERROR,
             syncMessage = "No se pudo leer la sesión o configuración. Los archivos se conservaron.")

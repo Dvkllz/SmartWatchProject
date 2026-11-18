@@ -65,8 +65,9 @@ class EmergencyRepository(private val storage: SessionStorage, private val api: 
 
     suspend fun recordings(): List<RecordingItem> = withContext(Dispatchers.IO) {
         api.emergencies().flatMap { emergency ->
-            emergency.audio.map { audio ->
-                RecordingItem(emergency.emergencyId, audio.uploadId, audio.receivedAt, audio.bytes, audio.simulated)
+            emergency.audio.mapIndexed { index, audio ->
+                RecordingItem(emergency.emergencyId, audio.uploadId, audio.receivedAt, audio.bytes, audio.simulated,
+                    index + 1, emergency.status, emergency.receivedAt)
             }
         }.sortedByDescending { it.receivedAt }.take(50)
     }
@@ -97,7 +98,10 @@ class EmergencyRepository(private val storage: SessionStorage, private val api: 
                     session.initialLocation?.latitude, session.initialLocation?.longitude, session.timestamp,
                     simulated = session.simulated || session.initialLocation?.simulated == true))
                 check(response.emergencyId == session.id) { "ID de servidor inesperado" }
-                edit { it.copy(serverConfirmed = true) }
+                edit { it.copy(serverConfirmed = true,
+                    notificationMode = response.notification?.mode,
+                    contactsAccepted = response.notification?.accepted ?: 0,
+                    contactsFailed = response.notification?.failed ?: 0) }
             }
             session = requireNotNull(pending)
             for (location in session.locations) {

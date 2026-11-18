@@ -280,7 +280,7 @@ private fun ActiveState(state: EmergencyState, onFinish: () -> Unit, language: A
                 fontSize = 10.sp, lineHeight = 15.sp, textAlign = TextAlign.Center,
                 color = palette.secondary, maxLines = 3, overflow = TextOverflow.Ellipsis,
             )
-            Text(if (state.serverConfirmed) tx(language, "SOS confirmado por el servidor", "SOS confirmed by server") else tx(language, "Esperando al servidor", "Waiting for server"),
+            Text(deliveryLabel(state, language),
                 fontSize = 9.sp, letterSpacing = 0.1.sp, fontWeight = FontWeight.Medium,
                 color = if (state.serverConfirmed) palette.positive else palette.warning, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
@@ -488,6 +488,14 @@ private fun OptionChip(label: String, selected: Boolean, palette: com.watchsos.u
 
 private fun tx(language: AppLanguage, spanish: String, english: String) =
     if (language == AppLanguage.ES) spanish else english
+
+private fun deliveryLabel(state: EmergencyState, language: AppLanguage): String = when {
+    !state.serverConfirmed -> tx(language, "Esperando al servidor", "Waiting for server")
+    state.contactsAccepted == 1 -> tx(language, "1 llamada solicitada", "1 call requested")
+    state.contactsAccepted > 1 -> tx(language, "${state.contactsAccepted} llamadas solicitadas", "${state.contactsAccepted} calls requested")
+    state.contactsFailed > 0 -> tx(language, "SOS recibido · llamada con error", "SOS received · call failed")
+    else -> tx(language, "SOS confirmado por el servidor", "SOS confirmed by server")
+}
 
 private fun localize(value: String, language: AppLanguage): String {
     if (language == AppLanguage.ES) return value

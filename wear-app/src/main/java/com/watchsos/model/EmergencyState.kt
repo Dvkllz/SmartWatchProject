@@ -6,6 +6,8 @@ data class EmergencyState(
     val status: EmergencyStatus = EmergencyStatus.IDLE,
     val emergencyId: String? = null,
     val serverConfirmed: Boolean = false,
+    val contactsAccepted: Int = 0,
+    val contactsFailed: Int = 0,
     val recording: Boolean = false,
     val audioMessage: String? = null,
     val locationMessage: String = "Buscando ubicación",

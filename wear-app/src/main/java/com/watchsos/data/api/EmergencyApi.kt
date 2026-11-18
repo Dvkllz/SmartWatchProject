@@ -15,7 +15,8 @@ data class CreateEmergencyRequest(
     val status: String = "ACTIVE",
     val simulated: Boolean,
 )
-data class EmergencyResponse(val emergencyId: String, val status: String)
+data class NotificationResult(val mode: String?, val accepted: Int, val failed: Int)
+data class EmergencyResponse(val emergencyId: String, val status: String, val notification: NotificationResult? = null)
 data class FinishRequest(val timestamp: String)
 
 interface EmergencyApi {

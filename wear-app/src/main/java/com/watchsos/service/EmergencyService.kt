@@ -120,10 +120,14 @@ class EmergencyService : Service() {
         try {
             repository.sync()
             app.state.update { it.copy(serverConfirmed = repository.pending?.serverConfirmed == true,
+                contactsAccepted = repository.pending?.contactsAccepted ?: 0,
+                contactsFailed = repository.pending?.contactsFailed ?: 0,
                 syncMessage = "Servidor actualizado") }
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (_: Exception) {
             app.state.update { it.copy(serverConfirmed = repository.pending?.serverConfirmed == true,
+                contactsAccepted = repository.pending?.contactsAccepted ?: 0,
+                contactsFailed = repository.pending?.contactsFailed ?: 0,
                 syncMessage = "Sin confirmación reciente; datos pendientes") }
             EventLog.event("sync_pending")
         }

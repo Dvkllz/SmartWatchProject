@@ -105,8 +105,8 @@ fun RecordingsScreen(
             }
             state.items.isEmpty() -> Text(if (language == AppLanguage.ES) "Aún no hay audios" else "No recordings yet",
                 color = palette.secondary, fontSize = 11.sp, textAlign = TextAlign.Center)
-            else -> state.items.forEachIndexed { index, item ->
-                RecordingRow(index + 1, item, playingId == item.uploadId, loadingId == item.uploadId) { play(item) }
+            else -> state.items.forEach { item ->
+                RecordingRow(item, language, playingId == item.uploadId, loadingId == item.uploadId) { play(item) }
                 Spacer(Modifier.height(6.dp))
             }
         }
@@ -115,7 +115,7 @@ fun RecordingsScreen(
 }
 
 @Composable
-private fun RecordingRow(index: Int, item: RecordingItem, playing: Boolean, loading: Boolean, onClick: () -> Unit) {
+private fun RecordingRow(item: RecordingItem, language: AppLanguage, playing: Boolean, loading: Boolean, onClick: () -> Unit) {
     val palette = LocalSosPalette.current
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(palette.surface)
@@ -129,8 +129,14 @@ private fun RecordingRow(index: Int, item: RecordingItem, playing: Boolean, load
         }
         Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
-            Text("Audio $index", color = palette.foreground, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-            Text("${formatTime(item.receivedAt)} · ${item.bytes / 1024} KB",
+            val alert = item.emergencyId.take(4).uppercase()
+            val title = "$alert · Audio ${item.segmentNumber}"
+            val status = if (language == AppLanguage.ES) {
+                if (item.emergencyStatus == "FINISHED") "Finalizada" else "Activa"
+            } else if (item.emergencyStatus == "FINISHED") "Finished" else "Active"
+            Text(title, color = palette.foreground, fontSize = 10.sp, fontWeight = FontWeight.SemiBold,
+                maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text("$status · ${formatTime(item.emergencyReceivedAt)} · ${item.bytes / 1024} KB",
                 color = palette.secondary, fontSize = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }

@@ -23,6 +23,9 @@ data class RecordingItem(
     val receivedAt: String,
     val bytes: Long,
     val simulated: Boolean,
+    val segmentNumber: Int,
+    val emergencyStatus: String,
+    val emergencyReceivedAt: String,
 )
 
 data class RecordingsState(
