@@ -4,7 +4,8 @@ import path from 'node:path';
 import { HttpError, requireActive, audioFormat } from '../models/emergency.js';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
-const response = record => ({ emergencyId: record.emergencyId, status: record.status });
+const response = record => ({ emergencyId: record.emergencyId, status: record.status,
+  notification: record.notification ?? null });
 
 export class EmergencyService {
   constructor(repository, notifications, config, logger = console) {
@@ -22,8 +23,15 @@ export class EmergencyService {
         fingerprint, locations: [], audio: [] };
       return { record: next, result: { created: true, record: next } };
     });
-    if (result.created) await this.notifications.emergencyCreated(result.record);
-    return { created: result.created, body: response(result.record) };
+    let current = result.record;
+    if (result.created) {
+      const notification = await this.notifications.emergencyCreated(result.record);
+      current = await this.repository.transaction(id, record => {
+        record.notification = notification;
+        return { record, result: record };
+      });
+    }
+    return { created: result.created, body: response(current) };
   }
   async location(id, body) {
     return this.repository.transaction(id, record => {
@@ -95,6 +103,7 @@ export class EmergencyService {
       receivedAt: record.receivedAt,
       finishedAt: record.finishedAt,
       simulated: record.simulated,
+      notification: record.notification ?? null,
       audio: record.audio.map(({ uploadId, bytes, mimeType, receivedAt, simulated }) =>
         ({ uploadId, bytes, mimeType, receivedAt, simulated })),
     }));

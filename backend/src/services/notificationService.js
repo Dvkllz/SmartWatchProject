@@ -7,14 +7,18 @@ export class NotificationService {
   }
 
   async emergencyCreated(record) {
-    if (this.demo) this.logger.info(`ALERTA SIMULADA: usuario ${record.userId} necesita ayuda.`, {
-      hora: record.timestamp, ubicacion: { latitude: record.latitude, longitude: record.longitude },
-      emergencyId: record.emergencyId, simulated: record.simulated,
-    });
-    else if (record.simulated) this.logger.info('trusted_contact_calls_skipped_simulated_emergency', {
-      emergencyId: record.emergencyId,
-    });
-    else await this.callTrustedContacts(record);
+    if (this.demo) {
+      this.logger.info(`ALERTA SIMULADA: usuario ${record.userId} necesita ayuda.`, {
+        hora: record.timestamp, ubicacion: { latitude: record.latitude, longitude: record.longitude },
+        emergencyId: record.emergencyId, simulated: record.simulated,
+      });
+      return { mode: 'demo', accepted: 0, failed: 0, submittedAt: new Date().toISOString() };
+    }
+    if (record.simulated) {
+      this.logger.info('trusted_contact_calls_skipped_simulated_emergency', { emergencyId: record.emergencyId });
+      return { mode: 'simulated', accepted: 0, failed: 0, submittedAt: new Date().toISOString() };
+    }
+    return this.callTrustedContacts(record);
   }
 
   async callTrustedContacts(record) {
@@ -64,6 +68,12 @@ export class NotificationService {
       accepted: outcomes.length - failed.length,
       failed: failed.length,
     });
+    return {
+      mode: trialMode ? 'twilio-trial' : 'twilio',
+      accepted: outcomes.length - failed.length,
+      failed: failed.length,
+      submittedAt: new Date().toISOString(),
+    };
   }
 }
 
