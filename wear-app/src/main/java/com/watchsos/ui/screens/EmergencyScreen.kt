@@ -63,6 +63,7 @@ fun EmergencyScreen(
     onStart: () -> Unit,
     onFinish: () -> Unit,
     onRetry: () -> Unit,
+    onReturnHome: () -> Unit,
     onLoadRecordings: () -> Unit,
     onPrepareRecording: suspend (RecordingItem) -> String,
     onThemeChange: (AppThemeMode) -> Unit,
@@ -101,7 +102,12 @@ fun EmergencyScreen(
                 )
                 "pending" -> PendingState(state, onRetry, preferences.language)
                 "active" -> ActiveState(state, onFinish, preferences.language)
-                "finished" -> FinishedState(state, configurationReady, onStart, preferences.language)
+                "finished" -> FinishedState(
+                    state = state,
+                    language = preferences.language,
+                    onReturnHome = onReturnHome,
+                    onRecordings = { showRecordings = true; onLoadRecordings() },
+                )
                 else -> HomeState(
                     state = state,
                     configurationReady = configurationReady,
@@ -113,7 +119,7 @@ fun EmergencyScreen(
                 )
             }
         }
-        if (screen == "home" || screen == "finished") SmallRecordingsButton(
+        if (screen == "home") SmallRecordingsButton(
             language = preferences.language,
             palette = palette,
             modifier = Modifier.align(Alignment.TopStart),
@@ -310,25 +316,51 @@ private fun PendingState(state: EmergencyState, onRetry: () -> Unit, language: A
 }
 
 @Composable
-private fun FinishedState(state: EmergencyState, configurationReady: Boolean, onStart: () -> Unit, language: AppLanguage) {
+private fun FinishedState(
+    state: EmergencyState,
+    language: AppLanguage,
+    onReturnHome: () -> Unit,
+    onRecordings: () -> Unit,
+) {
     val palette = LocalSosPalette.current
     Column(
-        Modifier.fillMaxSize().padding(start = 22.dp, top = 12.dp, end = 22.dp, bottom = 30.dp),
+        Modifier.fillMaxSize().padding(start = 22.dp, top = 12.dp, end = 22.dp, bottom = 28.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         LabelWithDot(tx(language, "Cierre confirmado", "Closure confirmed"), palette.positive)
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(tx(language, "Alerta finalizada", "Alert finished"), fontSize = 17.sp, lineHeight = 20.sp, letterSpacing = 0.1.sp,
+            Box(
+                Modifier.size(46.dp).clip(CircleShape).background(palette.positive.copy(alpha = 0.14f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text("✓", color = palette.positive, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            }
+            Text(tx(language, "Alerta finalizada", "Alert finished"), fontSize = 16.sp, lineHeight = 19.sp, letterSpacing = 0.1.sp,
                 fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, color = palette.foreground)
             Text(localize(state.syncMessage ?: "El servidor confirmó el cierre.", language), fontSize = 9.sp, lineHeight = 12.sp,
                 textAlign = TextAlign.Center, color = palette.secondary, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
-        if (configurationReady) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                PermissionAction(language, onReady = onStart)
-                Text(tx(language, "Mantén SOS para otra alerta", "Hold SOS for a new alert"), fontSize = 8.sp, color = palette.secondary)
-            }
+        Row(
+            Modifier.widthIn(max = 132.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            FinishedActionButton(
+                label = tx(language, "Inicio", "Home"),
+                description = tx(language, "Volver al inicio", "Back to home"),
+                accent = palette.accent,
+                modifier = Modifier.weight(1f),
+                filled = true,
+                onClick = onReturnHome,
+            )
+            FinishedActionButton(
+                label = tx(language, "♫  Audios", "♫  Recordings"),
+                description = tx(language, "Ver grabaciones", "View recordings"),
+                accent = palette.accent,
+                modifier = Modifier.weight(1f),
+                onClick = onRecordings,
+            )
         }
     }
 }
@@ -383,6 +415,33 @@ private fun ActionButton(label: String, accent: Color, onClick: () -> Unit, fill
     ) {
         Text(label, color = if (filled) Color.White else accent, fontSize = 10.sp, letterSpacing = 0.1.sp,
             fontWeight = FontWeight.SemiBold, maxLines = 1)
+    }
+}
+
+@Composable
+private fun FinishedActionButton(
+    label: String,
+    description: String,
+    accent: Color,
+    modifier: Modifier = Modifier,
+    filled: Boolean = false,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier.height(32.dp).clip(CircleShape)
+            .background(if (filled) accent else accent.copy(alpha = 0.14f))
+            .clickable(role = Role.Button, onClick = onClick)
+            .semantics { contentDescription = description; role = Role.Button },
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            label,
+            color = if (filled) Color.White else accent,
+            fontSize = 8.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 

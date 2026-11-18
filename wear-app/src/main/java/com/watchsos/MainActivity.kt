@@ -28,6 +28,7 @@ class MainActivity : ComponentActivity() {
                         onStart = viewModel::start,
                         onFinish = viewModel::finish,
                         onRetry = viewModel::retryFinish,
+                        onReturnHome = viewModel::returnHome,
                         onLoadRecordings = viewModel::loadRecordings,
                         onPrepareRecording = viewModel::recordingPath,
                         onThemeChange = app::setTheme,
