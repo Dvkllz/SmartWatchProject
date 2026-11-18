@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.watchsos.SosApplication
+import com.watchsos.model.EmergencyState
 import com.watchsos.model.EmergencyStatus
 import com.watchsos.model.RecordingsState
 import com.watchsos.model.RecordingItem
@@ -79,6 +80,13 @@ class EmergencyViewModel(application: Application) : AndroidViewModel(applicatio
                 app.state.update { it.copy(status = EmergencyStatus.ERROR,
                     syncMessage = "Cierre pendiente. Comprueba conexión y backend; los datos siguen guardados.") }
             }
+        }
+    }
+
+    fun returnHome() {
+        val current = state.value
+        if (current.status == EmergencyStatus.FINISHED && !current.pending) {
+            app.state.value = EmergencyState()
         }
     }
 }
