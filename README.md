@@ -1,6 +1,6 @@
 # Watch SOS — MVP Wear OS
 
-Aplicación nativa Kotlin/Compose para activar una emergencia con una pulsación de dos segundos, registrar audio y ubicación, enviarlos a un backend local y finalizar la alerta. Los contactos son simulados: **no se contacta a servicios de emergencia ni se envían SMS**.
+Aplicación nativa Kotlin/Compose para activar una emergencia con una pulsación de dos segundos, registrar audio y ubicación, enviarlos a un backend local y finalizar la alerta. En modo seguro las notificaciones se simulan; el modo live puede llamar a contactos de confianza mediante Twilio. **No llama directamente a servicios públicos de emergencia ni envía SMS**.
 
 ## Arquitectura
 
@@ -42,7 +42,7 @@ El backend puede iniciar llamadas de voz con Twilio Programmable Voice cuando re
 
 Las llamadas se hacen al crear una emergencia no simulada; el mensaje de voz anuncia el SOS y lee las coordenadas cuando están disponibles. La variante `demoDebug` nunca llama a contactos. Para probar con el emulador usa `liveDebug`, un número propio verificado en Twilio y el backend local; las cuentas de prueba de Twilio pueden limitar los destinos y las llamadas pueden generar cargos. La llamada la inicia el backend mediante la API de llamadas salientes de Twilio ([documentación oficial](https://www.twilio.com/docs/voice/api/call-resource)).
 
-La pantalla principal incluye el botón `♫` para consultar las grabaciones recibidas por el backend. La lista muestra los segmentos más recientes y los descarga a la caché privada del reloj antes de reproducirlos. Durante una emergencia confirmada la interfaz mantiene el estado activo y muestra **Alerta enviada**; `Offline` queda reservado para una sesión realmente interrumpida con datos pendientes.
+La pantalla principal incluye el botón `♫` para consultar las grabaciones recibidas por el backend. La lista agrupa visualmente cada segmento por alerta, muestra su estado y lo descarga a la caché privada del reloj antes de reproducirlo. Durante una emergencia confirmada la interfaz mantiene el estado activo y muestra **Alerta enviada**; `Offline` queda reservado para una sesión realmente interrumpida con datos pendientes. También presenta cuántas solicitudes de llamada aceptó Twilio y cuántas rechazó. “Llamada solicitada” confirma la aceptación del proveedor, no que el contacto haya contestado.
 
 ## Abrir y compilar la app
 
